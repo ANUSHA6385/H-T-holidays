@@ -73,7 +73,7 @@ const Newproduct = (props) => {
   
       const isProductNameExists = props.productsData.products.some(item => item.productName === productName);
       if (isProductNameExists) {
-        alert("Product name already exists!");
+       // alert("Product name already exists!");
         return;
       }
   
@@ -101,7 +101,7 @@ const Newproduct = (props) => {
       setShowAlertModal(false);
       resetInputFields();
 
-      toast.success("Data Saved Successfully");
+      //toast.success("Data Saved Successfully");
     } catch (error) {
       console.error("Error adding product:", error);
 
