@@ -12,19 +12,15 @@ import {
 
 
 } from "react-bootstrap";
+import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
+import "react-toastify/dist/ReactToastify.css"; 
 import InputGroup from "react-bootstrap/InputGroup";
-
-
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-
-
 import { Typeahead } from "react-bootstrap-typeahead";
-
 import axios from "axios";
 import { useDispatch, connect } from "react-redux";
 import { GET_ALL_PRODUCTS_API_CALL, ADD_PRODUCT_API_CALL, GET_ALL_CUSTOMERS_API_CALL } from "../../utils/Constant";
-
 const Newproduct = (props) => {
   const [showModal, setShowModal] = useState(false);
   const [showModaledit, setShowModaledit] = useState(false);
@@ -50,23 +46,10 @@ const Newproduct = (props) => {
   const [masterCategory, setMasterCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [masterCategoryError, setMasterCategoryError] = useState(false);
+
   
 
-  useEffect(() => {
- 
-    if (showAlertModal) {
-      const timeoutId = setTimeout(() => {
-        setShowAlertModal(false);
-      }, 500); 
-  
-      return () => clearTimeout(timeoutId);
-    }
-  
-    if (success) {
-      window.location.reload();
-    }
-  }, [showAlertModal, success]);
-  
+
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -78,46 +61,55 @@ const Newproduct = (props) => {
   }, [dispatch, props.customers.customersList.length]);
   
   const handleSubmit = () => {
-    if (!productName.trim()) {
-      setProductNameError(true);
-      return;
-    }
-    if (!masterCategory) {
-      setMasterCategoryError(true);
-      return;
-    }
-    const isProductNameExists = props.productsData.products.some(item => item.productName === productName);
-  if (isProductNameExists) {
- 
-    alert("Product name already exists!");
-    return;
-  }
-    const bodyData = {
-      productName: productName,
-      supplierId: supplierId,
-      productType: productType,
-      productDescription: description,
-      supplierName: supplierName,
-      createdBy: props.loggedInUser.loginId,
-      productUrl: productUrl,
-      masterCategory: masterCategory,
-    };
+    try {
+      if (!productName.trim()) {
+        setProductNameError(true);
+        return;
+      }
+      if (!masterCategory) {
+        setMasterCategoryError(true);
+        return;
+      }
   
-    console.log("Body Data:", bodyData);
-    dispatch({ type: ADD_PRODUCT_API_CALL, payload: bodyData });
-    setShowModal(false);
-    setProductType("SERVICES");
-    setProductName("");
-    setProductUrl("");
-    setDescription("");
-    setMasterCategory("");
-    setSupplierNameError(false);
-    setProductNameError(false);
-    setShowAlertModal(true);
-    setShowAlertModal(true);
-    setSuccess("Success");
+      const isProductNameExists = props.productsData.products.some(item => item.productName === productName);
+      if (isProductNameExists) {
+        alert("Product name already exists!");
+        return;
+      }
+  
+      const bodyData = {
+        productName: productName,
+        supplierId: supplierId,
+        productType: productType,
+        productDescription: description,
+        supplierName: supplierName,
+        createdBy: props.loggedInUser.loginId,
+        productUrl: productUrl,
+        masterCategory: masterCategory,
+      };
+  
+      console.log("Body Data:", bodyData);
+      dispatch({ type: ADD_PRODUCT_API_CALL, payload: bodyData });
+      setShowModal(false);
+      setProductType("SERVICES");
+      setProductName("");
+      setProductUrl("");
+      setDescription("");
+      setMasterCategory("");
+      setSupplierNameError(false);
+      setProductNameError(false);
+      setShowAlertModal(false);
+      resetInputFields();
+
+      toast.success("Data Saved Successfully");
+    } catch (error) {
+      console.error("Error adding product:", error);
+
+      toast.error("Failed to save data");
+    }
     
   };
+  
   const resetInputFields = () => {
     setProductType("SERVICES");
     setProductName("");
@@ -126,6 +118,7 @@ const Newproduct = (props) => {
     setMasterCategory("");
     setSupplierNameError(false);
     setProductNameError(false);
+    
   };
   
   const handleOptionClick1 = (index) => {
@@ -217,6 +210,7 @@ const Newproduct = (props) => {
 }, [props.productsData.products, currentPage]);
   return (
     <div style={{ paddingRight: 50, paddingLeft: 50 ,marginTop:70}}>
+        <ToastContainer position="top-right" autoClose={3000} />
       <Row style={{ marginTop: "2%" }}>
         <Col className="col-8" style={{}}>
           <div className="d-flex">
@@ -566,44 +560,7 @@ const Newproduct = (props) => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <Modal show={showAlertModal}>
-  <Modal.Header >
-    <Modal.Title style={{fontSize:'12px'}}>Product Data</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    {success === 'Success' ? (
-      <>
-        <div className="d-flex align-items-center">
-        <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="icon icon-tabler icon-tabler-circle-check"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  strokeWidth="2"
-  stroke="#3bb54a"
-  fill="none"
-  strokeLinecap="round"
-  strokeLinejoin="round"
-  style={{ marginLeft: '31%' }}
->
-
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <circle cx="12" cy="12" r="9" />
-            <path d="M9 12l2 2l4 -4" />
-          </svg>
-          <p className="mb-0 ml-2">Data Saved Successfully</p>
-        </div>
-      </>
-    ) : (
-      <Alert variant="danger">Data Saved Unsuccessfully</Alert>
-    )}
-  </Modal.Body>
-</Modal>
-
-      {
-        props.productsData.error ? <Alert clas>[No Customer Data Fount]</Alert> : null
-      }
+  
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 20, paddingBottom: 100 }}>
         {
