@@ -5,6 +5,7 @@ import MasterSaga from "./MasterSaga";
 import ProductSaga from "./ProductSaga";
 import PurchaseOrderSaga from "./PurchaseOrderSaga";
 import InvoiceSaga from "./InvoiceSaga";
+import ReceiptSaga from "./ReceiptSaga";
 
 
 function* RootSaga() {
@@ -14,7 +15,8 @@ function* RootSaga() {
         MasterSaga(),
         ProductSaga(),
         PurchaseOrderSaga(),
-        InvoiceSaga()
+        InvoiceSaga(),
+        ReceiptSaga()
     ])
 }
 

@@ -19,6 +19,7 @@ function* getAllInvoiceApiCall() {
 }
 
 function* createInvoice(data) {
+    console.log("calling create invoice")
     const response = yield call(CreateInvoice, data.data);
     if(response.status === 200) {
         if (response.data.code === 200){
@@ -29,13 +30,22 @@ function* createInvoice(data) {
 }
 
 function* generateInvoicePDFApiCall(data) {
+    console.log("generate invoice api call", data.invoiceId)
     const response = yield call(GenerateInvoicePdfApi, data.invoiceId)
-
-    if (response.status === 200) {
-        if (response.data.code === 200) {
-            yield put({type: GENERATE_INVOICE_PDF_API_RESPONSE, data: response.data.fileUrl})
+    console.log(response)
+    try {
+        if (response.status === 200) {
+            if (response.data.code === 200) {
+                yield put({type: GENERATE_INVOICE_PDF_API_RESPONSE, data: response.data.data.fileUrl})
+            }
+            else {
+            }
         }
     }
+    catch(error) {
+
+    }
+    
 }
 
 function* InvoiceSaga() {

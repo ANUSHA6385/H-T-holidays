@@ -17,7 +17,7 @@ import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import "./Invoice.css";
 import { Link } from "react-router-dom";
 import { useDispatch, connect } from "react-redux";
-import { GET_ALL_INVOICE_API_CALL, GENERATE_INVOICE_PDF_API_CALL } from "../../utils/Constant";
+import { GET_ALL_INVOICE_API_CALL, GENERATE_INVOICE_PDF_API_CALL, RESET_INVOICE_CODE } from "../../utils/Constant";
 
 const Newproduct = (props) => {
   //use states
@@ -26,10 +26,19 @@ const Newproduct = (props) => {
   const [endDate, setEndDate] = useState(null);
 
   const dispatch = useDispatch();
+  
+  console.log(props)
 
   useEffect(() => {
     dispatch({ type: GET_ALL_INVOICE_API_CALL });
   }, []);
+
+  useEffect(() => {
+    if (props.invoice.code === 100) {
+      window.open(props.invoice.fileurl, "_blank")
+      dispatch({type: RESET_INVOICE_CODE})
+    }
+  }, [props.invoice.code])
 
   //Handlers
   const handleDateChange = (dates) => {
@@ -81,7 +90,7 @@ const Newproduct = (props) => {
                 >
                   Total Amount
                   <br />
-                  <span style={{ color: "black" }}>{(props.invoice.totalAmount).toFixed(2)} AED</span>
+                  <span style={{ color: "black" }}>{(props.invoice.totalAmount)} AED</span>
                 </p>
                 <p
                   style={{
@@ -94,7 +103,7 @@ const Newproduct = (props) => {
                 >
                   Unpaid
                   <br />
-                  <span style={{ color: "black" }}>{(props.invoice.unpaidAmount).toFixed(2)} AED</span>
+                  <span style={{ color: "black" }}>{(props.invoice.unpaidAmount)} AED</span>
                 </p>
                 <p
                   style={{
@@ -107,7 +116,7 @@ const Newproduct = (props) => {
                 >
                   Paid
                   <br />
-                  <span style={{ color: "black" }}>{(props.invoice.paidAmount).toFixed(2)} AED</span>
+                  <span style={{ color: "black" }}>{(props.invoice.paidAmount)} AED</span>
                 </p>
               </div>
             </div>
@@ -135,7 +144,7 @@ const Newproduct = (props) => {
                   }}
                 >
                   Total Amount :{" "}
-                  <span style={{ color: "black" }}>{(props.invoice.totalAmount).toFixed(2)} AED</span>
+                  <span style={{ color: "black" }}>{(props.invoice.totalAmount)} AED</span>
                 </p>
                 <p
                   style={{
@@ -145,14 +154,14 @@ const Newproduct = (props) => {
                     fontWeight: "500",
                   }}
                 >
-                  Unpaid : <span style={{ color: "black" }}>{(props.invoice.unpaidAmount).toFixed(2)} AED</span>
+                  Unpaid : <span style={{ color: "black" }}>{(props.invoice.unpaidAmount)} AED</span>
                 </p>
               </div>
               <ProgressBar
                 className="progress"
                 now={parseInt(
-                  ((props.invoice.paidAmount).toFixed(2) /
-                    (props.invoice.totalAmount.toFixed(2))) *
+                  ((props.invoice.paidAmount) /
+                    (props.invoice.totalAmount)) *
                     100
                 )}
                 style={{ width: "93%", marginLeft: "21px" }}
@@ -283,14 +292,17 @@ const Newproduct = (props) => {
                     <td>{item.net}</td>
                     <td>{item.totalAmount}</td>
                     <td>
-                      <FiDownload style={{cursor:"pointer"}} onClick={() => {
-                        if (item.supplierPOUrl) {
-                            window.open(item.supplierPOUrl, "_new")
-                        }
-                        else {
-                          dispatch({type: GENERATE_INVOICE_PDF_API_CALL, invoiceId: item.invoiceOrderId})
-                        }
-                      }} />
+                      {
+                        item.products.length > 0 ? <FiDownload style={{cursor:"pointer"}} onClick={() => {
+                          if (item.supplierPOUrl) {
+                              window.open(item.supplierPOUrl, "_new")
+                          }
+                          else {
+                            dispatch({type: GENERATE_INVOICE_PDF_API_CALL, invoiceId: item.invoiceOrderId})
+                          }
+                        }} /> : null
+                      }
+                      
                     </td>
                   </tr>
                 ))}

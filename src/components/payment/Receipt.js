@@ -16,15 +16,19 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FaSearch } from "react-icons/fa";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { useDispatch, connect } from "react-redux";
+import { GET_ALL_RECEIPT_API_CALL } from "../../utils/Constant";
 
-function Receipt(props) {
+const  Receipt = (props) => {
   const [getcustomer, setgetcustomer] = useState([]);
   const [entitiesPerPage, setEntitiesPerPage] = useState("");
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [filteredReceipt, setFilteredReceipt] = useState([])
 
   const dispatch = useDispatch();
+
+  console.log(props)
 
   const handleDateChange = (dates) => {
     if (dates === NaN) {
@@ -38,15 +42,25 @@ function Receipt(props) {
   };
 
   useEffect(() => {
-    // dispatch({type: GET_ALL_CUSTOMERS_API_CALL, data: 3})
-    axios
-      .post("http://68.178.161.233:8080/handt/v2/payment/getAllReceipts")
-      .then((response) => {
-        setgetcustomer(response.data.data);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-    console.log(entitiesPerPage);
-  }, [entitiesPerPage]);
+    dispatch({type: GET_ALL_RECEIPT_API_CALL})
+  }, [])
+
+  useEffect(() => {
+    setFilteredReceipt(props.receipt.listAllReceipt);
+  }, [props.receipt.listAllReceipt])
+
+  // useEffect(() => {
+  //   // dispatch({type: GET_ALL_CUSTOMERS_API_CALL, data: 3})
+  //   axios
+  //     .post("http://68.178.161.233:8080/handt/v2/payment/getAllReceipts")
+  //     .then((response) => {
+  //       setgetcustomer(response.data.data);
+  //     })
+  //     .catch((error) => console.error("Error fetching data:", error));
+  //   console.log(entitiesPerPage);
+  // }, [entitiesPerPage]);
+
+ 
 
   // console.log("the data pages",entitiesPerPage);
 
@@ -80,7 +94,13 @@ function Receipt(props) {
               <FormControl
                 placeholder="Search Customer..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setFilteredReceipt(props.receipt.listAllReceipt.filter((item) => {
+                    console.log(item)
+                    return item.customerName.toLocaleLowerCase().includes(e.target.value.toLocaleLowerCase())
+                  }));
+                }}
                 style={{
                   background: "#80808036",
                   boxShadow: "none",
@@ -99,7 +119,6 @@ function Receipt(props) {
                 className="d-flex form-select align-item-center ms-2 w-40 mb-3 fs-6 inputfocus"
                 onChange={(e) => {
                   setEntitiesPerPage(e.target.value);
-                  console.log("Selected entities per page:", e.target.value);
                 }}
                 value={entitiesPerPage}
               >
@@ -138,15 +157,7 @@ function Receipt(props) {
               </tr>
             </thead>
             <tbody>
-              {getcustomer
-                .filter((item) => {
-                  return search.toLowerCase() === ""
-                    ? item
-                    : item.customerName
-                        .toLowerCase()
-                        .includes(search.toLowerCase());
-                })
-                .map((item) => (
+              {filteredReceipt.map((item) => (
                   <tr key={item.id}>
                     <td>{item.customerId}</td>
                     <td>{item.customerName}</td>
@@ -155,13 +166,7 @@ function Receipt(props) {
                     <td>{item.referenceNumber}</td>
                   </tr>
                 ))}
-              {getcustomer.filter((item) => {
-                return search.toLowerCase() === ""
-                  ? item
-                  : item.customerName
-                      .toLowerCase()
-                      .includes(search.toLowerCase());
-              }).length === 0 && (
+              {filteredReceipt.length === 0 && (
                 <tr>
                   <td
                     colSpan={5}
@@ -186,6 +191,7 @@ function Receipt(props) {
 const mapsToProps = (state) => {
   return {
     customers: state.customers,
+    receipt: state.receipt
   };
 };
 

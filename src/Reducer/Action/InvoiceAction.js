@@ -9,9 +9,12 @@ export const CreateInvoice = (data) => {
 };
 
 export const GenerateInvoicePdfApi = (invoiceId) => {
-  return AxiosConfig.get('/v2/pdf/generateInvoice', {
-    params: {
-      invoiceId: invoiceId
-    }
-  })
+  if (invoiceId) {
+    return AxiosConfig.get('/v2/pdf/generateInvoice', {
+      params: {
+        invoiceId: invoiceId
+      }
+    })
+  }
+  return null;
 }

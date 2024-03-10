@@ -5,6 +5,7 @@ import ProductReducer from "./ProductReducer";
 import MasterReducer from "./MasterReducer";
 import PurchaseOrderReducer from "./PurchaseOrderReducer";
 import InvoiceReducer from "./InvoiceReducer";
+import ReceiptReducer from "./ReceiptReducer";
 
 const RootReducer = combineReducers({
     users: UserReducer,
@@ -12,7 +13,8 @@ const RootReducer = combineReducers({
     masterData: MasterReducer,
     productsData: ProductReducer,
     purchaseOrder: PurchaseOrderReducer,
-    invoice: InvoiceReducer
+    invoice: InvoiceReducer,
+    receipt: ReceiptReducer
 })
 
 export default RootReducer;
